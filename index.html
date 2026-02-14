@@ -454,7 +454,7 @@
           <h2>Yayyy!   </h2>
           <p class="hint">💌 Evelyn Kim :&gt; hehe</p>
 
-          <!-- ✅ 여기서 LP 옆에 있던 하트(heartWrap)만 제거하고, 중앙에 LP+오디오만 둠 -->
+          
           <div class="yayGrid">
             <div class="lpWrap">
               <div class="lpStage">
@@ -517,14 +517,14 @@
     const tonearm = document.getElementById("tonearm");
     const music = document.getElementById("bgMusic");
   
-    // ✅ No 클릭 상태 관리: 0 = 아직, 1 = 한번 눌러서 "Are you sure?" 상태
+
     let noState = 0;
   
-    // ❌ hover 이벤트 제거 (있다면 삭제/주석처리)
+
     // btnNo.addEventListener("mouseenter", ...)
     // btnNo.addEventListener("mouseleave", ...)
   
-    // ✅ No: 첫 클릭 -> Are you sure? / 두번째 클릭 -> Game Over
+
     btnNo.addEventListener("click", () => {
       if (noState === 0) {
         noState = 1;
@@ -544,7 +544,7 @@
       stopConfetti();
     });
   
-    // ✅ Retry: 초기화
+
     btnTryAgain.addEventListener("click", () => {
       body.classList.remove("gameover-mode");
       screenGameOver.classList.remove("active");
@@ -558,7 +558,7 @@
       stopConfetti();
     });
   
-    // ✅ Yes => Yay + confetti + LP spin + music play
+
     btnYes.addEventListener("click", () => {
       body.classList.remove("gameover-mode");
       screenGameOver.classList.remove("active");
