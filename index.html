@@ -479,8 +479,7 @@
 
               <!-- Put your mp3 in the SAME folder as this html and name it exactly: sunsetz.mp3 -->
               <audio id="bgMusic" preload="auto" controls>
-                <source src="https://raw.githubusercontent.com/evlingbling/valentines1/main/sunsetz.mp3" type="audio/mpeg">
-
+                <source src="sunsetz.mp3" type="audio/mpeg" />
                 Your browser does not support the audio element.
               </audio>
             
@@ -502,71 +501,88 @@
     </div>
   </div>
 
+
   <script>
     const body = document.body;
-
+  
     const btnYes = document.getElementById("btnYes");
     const btnNo  = document.getElementById("btnNo");
-
+  
     const screenMain = document.getElementById("screenMain");
     const screenYay  = document.getElementById("screenYay");
     const screenGameOver = document.getElementById("screenGameOver");
     const btnTryAgain = document.getElementById("btnTryAgain");
-
+  
     const vinyl = document.getElementById("vinyl");
     const tonearm = document.getElementById("tonearm");
     const music = document.getElementById("bgMusic");
-
-    // Hover only changes text
-    btnNo.addEventListener("mouseenter", () => { btnNo.textContent = "Are you sure?"; });
-    btnNo.addEventListener("mouseleave", () => { btnNo.textContent = "No"; });
-
-    // No click after "Are you sure?" => Game Over
+  
+    // ✅ No 클릭 상태 관리: 0 = 아직, 1 = 한번 눌러서 "Are you sure?" 상태
+    let noState = 0;
+  
+    // ❌ hover 이벤트 제거 (있다면 삭제/주석처리)
+    // btnNo.addEventListener("mouseenter", ...)
+    // btnNo.addEventListener("mouseleave", ...)
+  
+    // ✅ No: 첫 클릭 -> Are you sure? / 두번째 클릭 -> Game Over
     btnNo.addEventListener("click", () => {
-      if (btnNo.textContent.includes("Are you sure")) {
-        screenMain.classList.remove("active");
-        screenYay.classList.remove("active");
-        screenGameOver.classList.add("active");
-        body.classList.add("gameover-mode");
-
-        stopYayMedia();
-        stopConfetti();
+      if (noState === 0) {
+        noState = 1;
+        btnNo.textContent = "Are you sure?";
+        // (선택) 2초 뒤에 다시 No로 돌아가게 하고 싶으면 아래 주석 해제
+        // setTimeout(() => { if(noState===1){ noState=0; btnNo.textContent="No"; } }, 2500);
+        return;
       }
+  
+      // 두번째 클릭이면 Game Over
+      screenMain.classList.remove("active");
+      screenYay.classList.remove("active");
+      screenGameOver.classList.add("active");
+      body.classList.add("gameover-mode");
+  
+      stopYayMedia();
+      stopConfetti();
     });
-
-    // Retry
+  
+    // ✅ Retry: 초기화
     btnTryAgain.addEventListener("click", () => {
       body.classList.remove("gameover-mode");
       screenGameOver.classList.remove("active");
       screenYay.classList.remove("active");
       screenMain.classList.add("active");
+  
+      noState = 0;
       btnNo.textContent = "No";
-
+  
       stopYayMedia();
       stopConfetti();
     });
-
-    // Yes => Yay + confetti + LP spin + music play
+  
+    // ✅ Yes => Yay + confetti + LP spin + music play
     btnYes.addEventListener("click", () => {
       body.classList.remove("gameover-mode");
       screenGameOver.classList.remove("active");
       screenMain.classList.remove("active");
       screenYay.classList.add("active");
-
+  
+      // 다음에 다시 메인으로 돌아갔을 때를 대비해 No 상태 초기화
+      noState = 0;
+      btnNo.textContent = "No";
+  
       startYayMedia();
       burstConfetti();
     });
-
+  
     function startYayMedia(){
       vinyl.classList.add("playing");
       tonearm.classList.add("playing");
-
+  
       music.currentTime = 0;
       music.play().catch(() => {
-        // Mobile may require the user to press play; controls are visible anyway.
+        // 모바일은 사용자 탭 필요할 수 있음
       });
     }
-
+  
     function stopYayMedia(){
       vinyl.classList.remove("playing");
       tonearm.classList.remove("playing");
@@ -575,11 +591,11 @@
         music.currentTime = 0;
       }catch(e){}
     }
-
-    // Confetti (hearts only)
+  
+    // --- Confetti (hearts only) ---
     const canvas = document.getElementById("confetti");
     const ctx = canvas.getContext("2d", { alpha: true });
-
+  
     function resize(){
       canvas.width  = window.innerWidth * devicePixelRatio;
       canvas.height = window.innerHeight * devicePixelRatio;
@@ -587,12 +603,12 @@
     }
     window.addEventListener("resize", resize);
     resize();
-
+  
     let confettiParticles = [];
     let confettiRunning = false;
-
+  
     function rand(min,max){ return Math.random()*(max-min)+min; }
-
+  
     function makeParticle(){
       return {
         x: rand(0, window.innerWidth),
@@ -606,7 +622,7 @@
         life: rand(100, 160)
       };
     }
-
+  
     function drawHeart(x,y,s,color,rot){
       ctx.save();
       ctx.translate(x,y);
@@ -623,11 +639,11 @@
       ctx.fill();
       ctx.restore();
     }
-
+  
     function tick(){
       if (!confettiRunning) return;
       ctx.clearRect(0,0,window.innerWidth, window.innerHeight);
-
+  
       confettiParticles.forEach(p => {
         p.x += p.vx;
         p.y += p.vy;
@@ -636,9 +652,9 @@
         p.life -= 1;
         drawHeart(p.x, p.y, p.r*1.9, p.color, p.rot);
       });
-
+  
       confettiParticles = confettiParticles.filter(p => p.life > 0 && p.y < window.innerHeight + 40);
-
+  
       if (confettiParticles.length > 0){
         requestAnimationFrame(tick);
       } else {
@@ -646,7 +662,7 @@
         ctx.clearRect(0,0,window.innerWidth, window.innerHeight);
       }
     }
-
+  
     function burstConfetti(){
       confettiParticles = [];
       const count = Math.floor(Math.min(220, 120 + window.innerWidth/6));
@@ -654,12 +670,13 @@
       confettiRunning = true;
       requestAnimationFrame(tick);
     }
-
+  
     function stopConfetti(){
       confettiParticles = [];
       confettiRunning = false;
       ctx.clearRect(0,0,window.innerWidth, window.innerHeight);
     }
   </script>
+  
 </body>
 </html>
